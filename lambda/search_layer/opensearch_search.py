@@ -224,7 +224,7 @@ def add_products(
             max_chunk_bytes=max_chunk_bytes
         )
     
-def text_search(index: str, search_term: str, size: int = 10):
+def text_search_template(index: str, search_term: str, size: int = 10):
     client = get_opensearch_client()
     offset = 0
     collapse_size = int(max(size / 15, 15))
@@ -249,7 +249,7 @@ def text_search(index: str, search_term: str, size: int = 10):
 
     return results['hits']['hits']
 
-def vector_search(index: str, query_vector: List[float], size: int = 10,vector_field: str = "vector_field"):
+def vector_search_template(index: str, query_vector: List[float], size: int = 10,vector_field: str = "vector_field"):
     client = get_opensearch_client()
     offset = 0
     collapse_size = int(max(size / 15, 15))
