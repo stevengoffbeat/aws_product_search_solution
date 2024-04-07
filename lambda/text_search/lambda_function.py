@@ -1,7 +1,7 @@
 import json
 from typing import List
 from opensearch_search import get_opensearch_client
-from embeddings import get_embedding_sagemaker
+from embeddings import get_embedding_sagemaker,get_reranker_scores
 
 response = {
     "statusCode": 200,
@@ -114,6 +114,10 @@ def lambda_handler(event, context):
         productIdName = evt_body['productIdName']
     print('productIdName:', productIdName)
     
+    rerankerEndpoint = ""
+    if "rerankerEndpoint" in evt_body.keys():
+        rerankerEndpoint = evt_body['rerankerEndpoint']
+    
     products = []
     product_id_set = set()
     if (searchType == 'text' or searchType == 'mix') and len(index) > 0 and len(query) > 0:
@@ -144,6 +148,24 @@ def lambda_handler(event, context):
                         product_id_set.add(product_id)
                 else:
                     products.append({'score':score,'source':metadata})
+                    
+    if searchType == 'mix' and len(rerankerEndpoint) > 0:
+        pairs = []
+        for product in products:
+            product_name = product['source']['product_name']
+            pair = [query,product_name]
+            pairs.append(pair)
+
+        scores = get_reranker_scores(pairs,rerankerEndpoint)
+        scores = scores['rerank_scores']
+        new_products=[]
+        for i in range(len(products)):
+            new_product = products[i].copy()
+            new_product['rerank_score'] = scores[i]
+            new_products.append(new_product)
+        products = sorted(new_products,key=lambda new_products:new_products['rerank_score'],reverse=True)
+        
+    
     print('products:',products)
                 
     response['body'] = json.dumps(

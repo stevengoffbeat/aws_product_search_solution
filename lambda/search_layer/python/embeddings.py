@@ -31,3 +31,16 @@ def get_image_embedding_sagemaker(endpoint_name: str, url: str):
 def run_inference(endpoint_name, inputs):
     response = smr_client.invoke_endpoint(EndpointName=endpoint_name, Body=json.dumps(inputs))
     return json.loads(response["Body"].read().decode("utf-8"))
+    
+def get_reranker_scores(pairs, endpoint_name):
+    response_model = smr_client.invoke_endpoint(
+        EndpointName=endpoint_name,
+        Body=json.dumps(
+            {
+                "inputs": pairs
+            }
+        ),
+        ContentType="application/json",
+    )
+    output = json.loads(response_model['Body'].read().decode('utf8'))
+    return output
