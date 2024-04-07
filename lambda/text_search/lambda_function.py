@@ -144,7 +144,7 @@ def lambda_handler(event, context):
                         product_id_set.add(product_id)
                 else:
                     products.append({'score':score,'source':metadata})
-                
+    print('products:',products)
                 
     response['body'] = json.dumps(
     {

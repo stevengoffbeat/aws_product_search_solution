@@ -83,7 +83,8 @@ def lambda_handler(event, context):
             metadata = result['_source']['metadata']
             if score >= vectorScoreThresholds:
                 products.append({'score':score,'source':metadata})
-        
+                
+        print('products:',products)
         response['body'] = json.dumps(
             {
                 'products': products
@@ -110,6 +111,8 @@ def lambda_handler(event, context):
                 'tagConfidentials': tagConfidentials
             }
         )
+        
+        print('tagConfidentials:',tagConfidentials)
     else:
         response['body'] = json.dumps(
             {
