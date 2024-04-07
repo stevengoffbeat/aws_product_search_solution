@@ -30,23 +30,24 @@ with st.sidebar:
 
     search_invoke_url = st.text_input(
         "Please input a image tag api url",
-        "",
+        "https://u9rpcxlh3c.execute-api.us-east-1.amazonaws.com/prod",
         key="image_search_invoke_url",
     )
    
     image_tags_sagemaker_endpoint = st.text_input(
         "Please input image tags sagemaker endpoint",
-        "",
+        "endpoint-clip-vit-base-patch32-2024-04-06-14-47-27-967",
         key="image_tags_endpoint",
     )
-    threshold = st.slider("Tag threshold",min_value=0, max_value=1, value=0.5, step=0.01)
+    threshold = st.slider("Tag threshold",min_value=0.0, max_value=1.0, value=0.3, step=0.01)
 
 # Add a button to start a new chat
 st.sidebar.button("New Image", on_click=new_image, type='primary')
 
 st.session_state.url = st.text_input(label="Please input image URL", value="")
 
-if st.button('Image Tags'):
+#if st.button('Image Tags'):
+if st.session_state.url:
     if len(st.session_state.url) ==0:
         st.write("Image url is None")
     elif len(search_invoke_url) == 0:
@@ -84,4 +85,3 @@ if st.button('Image Tags'):
             st.write('Category:')
             st.write(category)
             st.write('--------------------------------')
-       

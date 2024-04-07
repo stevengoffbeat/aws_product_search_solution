@@ -7,6 +7,7 @@ import pandas as pd
 
 def product_search(query,
                 invoke_url,
+                index,
                 endpoint_name: str = '',
                 searchType: str = 'text',
                 textSearchNumber: int = 3,
@@ -19,16 +20,17 @@ def product_search(query,
     url = invoke_url + '/text_search?'
     url += ('&query='+query)
     url += ('&searchType='+searchType)
+    url += ('&index='+index)
     if len(endpoint_name) > 0:
         url += ('&embeddingEndpoint='+endpoint_name)
     if textSearchNumber > 0:
-        url += ('&textSearchNumber='+textSearchNumber)
+        url += ('&textSearchNumber='+str(textSearchNumber))
     if vectorSearchNumber > 0:
-        url += ('&vectorSearchNumber='+vectorSearchNumber)
+        url += ('&vectorSearchNumber='+str(vectorSearchNumber))
     if textScoreThresholds > 0:
-        url += ('&textScoreThresholds='+textScoreThresholds)
+        url += ('&textScoreThresholds='+str(textScoreThresholds))
     if vectorScoreThresholds > 0:
-        url += ('&vectorScoreThresholds='+vectorScoreThresholds)
+        url += ('&vectorScoreThresholds='+str(vectorScoreThresholds))
     if len(language) > 0:
         url += ('&language='+language)
     if len(product_id_name) > 0:
@@ -53,39 +55,49 @@ with st.sidebar:
 
     search_invoke_url = st.text_input(
         "Please input a product search api url",
-        "",
+        "https://gr2nxjp3v4.execute-api.us-east-1.amazonaws.com/prod",
         key="product_search_invoke_url",
     )
     product_search_sagemaker_endpoint = st.text_input(
         "Please input product search sagemaker endpoint",
-        "",
+        "bge-m3-2024-03-31-02-43-25-634-endpoint",
         key="product_search_endpoint",
+    )
+
+    index = st.text_input(
+        "Please input product search opensearch index",
+        "adidas_demo_test_0406_5",
+        key="text_search_index",
     )
     
     search_type  = st.radio("Search Type",["text","vector",'mix'])
     st.write('For text search type:')
-    textSearchNumber = st.slider("Search Number",min_value=1, max_value=10, value=3, step=1)
-    textScoreThresholds = st.slider("Score Threshold",min_value=0, max_value=50, value=30, step=1)
+    textSearchNumber = st.slider("Text Search Number",min_value=1, max_value=10, value=3, step=1)
+    textScoreThresholds = st.slider("Text Score Threshold",min_value=0, max_value=50, value=0, step=1)
     
     st.write('For vector search type:')
-    vectorSearchNumber = st.slider("Search Number",min_value=1, max_value=10, value=3, step=1)
-    vectorScoreThresholds = st.slider("Score Threshold",min_value=0, max_value=1, value=0.5, step=0.01)
+    vectorSearchNumber = st.slider("Vector Search Number",min_value=1, max_value=10, value=3, step=1)
+    vectorScoreThresholds = st.slider("Vector Score Threshold",min_value=0.0, max_value=1.0, value=0.0, step=0.01)
 
 # Add a button to start a new chat
 st.sidebar.button("New Query", on_click=new_query, type='primary')
 
 st.session_state.query = st.text_input(label="Please input query", value="")
 
-if st.button('Product Search'):
+#if st.button('Product Search'):
+if st.session_state.query:
     if len(st.session_state.query) ==0:
         st.write("Query is None")
     elif len(search_invoke_url) == 0:
         st.write("Search invoke url is None")
     elif len(product_search_sagemaker_endpoint) == 0:
         st.write("Embedding sagemaker endpoint is None")
+    elif len(index) == 0:
+        st.write("Opensearch index is None")
         
     products = product_search(st.session_state.query,
                               search_invoke_url,
+                              index,
                               product_search_sagemaker_endpoint,
                               search_type,
                               textSearchNumber,
@@ -105,63 +117,54 @@ if st.button('Product Search'):
         image_list = []
         description_list = []
         scores_list = []
+        product_code_list = []
             
         for product in products:
             score = product['score']
-            scores_list.append(score)
+            scores_list.append(str(score))
             source = product['source']
             media_url = source['media_url']
             product_name = source['product_name']
             description = source['description_info']
+            product_code = source['product_code']
             item_name_list.append(product_name)
             image_list.append(media_url)
             description_list.append(description)
+            product_code_list.append(product_code)
             
         with col1:
-            if items_num >= 1:
-                st.write('product_name:' + item_name_list[0])
-                st.write('description_info:' + description_list[0])
-                st.write('score:' + scores_list[0])
-                st.image(image_list[0])
-            if items_num >= 4:
-                st.write('product_name:' +item_name_list[3])
-                st.write('description_info:' + description_list[3])
-                st.write('score:' + scores_list[3])
-                st.image(image_list[3])
-            if items_num >= 7:
-                st.write('product_name:' +item_name_list[6])
-                st.write('description_info:' + description_list[6])
-                st.write('score:' + scores_list[6])
-                st.image(image_list[6])
+            for i in range(items_num):
+                col = i % 3
+                if col == 0:
+                    name = item_name_list[i]
+                    s = f"<p style='font-size:12px;'>{name}</p>"
+                    st.markdown(s, unsafe_allow_html=True)
+                    st.image(image_list[i])
+                    with st.expander("详情"):
+                        st.write('product_code:' + '\n' +product_code_list[i])
+                        st.write('score:' + '\n' + scores_list[i])
+                        st.write('description_info:' + '\n' + description_list[i])
         with col2:
-            if items_num >= 2:
-                st.write('product_name:' +item_name_list[1])
-                st.write('description_info:' + description_list[1])
-                st.write('score:' + scores_list[1])
-                st.image(image_list[1])
-            if items_num >= 5:
-                st.write('product_name:' +item_name_list[4])
-                st.write('description_info:' + description_list[4])
-                st.write('score:' + scores_list[4])
-                st.image(image_list[4])
-            if items_num >= 8:
-                st.write('product_name:' +item_name_list[7])
-                st.write('description_info:' + description_list[7])
-                st.write('score:' + scores_list[7])
-                st.image(image_list[7])
+            for i in range(items_num):
+                col = i % 3
+                if col == 1:
+                    name = item_name_list[i]
+                    s = f"<p style='font-size:12px;'>{name}</p>"
+                    st.markdown(s, unsafe_allow_html=True)
+                    st.image(image_list[i])
+                    with st.expander("详情"):
+                        st.write('product_code:' + '\n' +product_code_list[i])
+                        st.write('score:' + '\n' + scores_list[i])
+                        st.write('description_info:' + '\n' + description_list[i])
         with col3:
-            if items_num >= 3:
-                st.write('product_name:' +item_name_list[2])
-                st.write('description_info:' + description_list[2])
-                st.write('score:' + scores_list[2])
-                st.image(image_list[2])
-            if items_num >= 6:
-                st.write('product_name:' +item_name_list[5])
-                st.write('description_info:' + description_list[5])
-                st.write('score:' + scores_list[5])
-                st.image(image_list[5])
-            if items_num >= 9:
-                st.write('product_name:' +item_name_list[8])
-                st.write('description_info:' + description_list[8])
-                st.write('score:' + scores_list[8])
-                st.image(image_list[8])
+            for i in range(items_num):
+                col = i % 3
+                if col == 2:
+                    name = item_name_list[i]
+                    s = f"<p style='font-size:12px;'>{name}</p>"
+                    st.markdown(s, unsafe_allow_html=True)
+                    st.image(image_list[i])
+                    with st.expander("详情"):
+                        st.write('product_code:' + '\n' +product_code_list[i])
+                        st.write('score:' + '\n' + scores_list[i])
+                        st.write('description_info:' + '\n' + description_list[i])

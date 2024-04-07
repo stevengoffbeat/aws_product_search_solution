@@ -17,7 +17,7 @@ class ProductOpenSearchStack(Stack):
     super().__init__(scope, construct_id, **kwargs)
 
 
-    ops_domain_name = 'product_search'
+    ops_domain_name = 'product-search'
 
     master_user_secret = aws_secretsmanager.Secret(self, "OpenSearchMasterUserSecret",
         generate_secret_string=aws_secretsmanager.SecretStringGenerator(
