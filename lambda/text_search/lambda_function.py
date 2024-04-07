@@ -109,10 +109,10 @@ def lambda_handler(event, context):
         language = evt_body['language']
     print('language:', language)
     
-    product_id_name = ""
-    if "product_id_name" in evt_body.keys():
-        product_id_name = evt_body['product_id_name']
-    print('product_id_name:', product_id_name)
+    productIdName = ""
+    if "productIdName" in evt_body.keys():
+        productIdName = evt_body['productIdName']
+    print('productIdName:', productIdName)
     
     products = []
     product_id_set = set()
@@ -122,8 +122,8 @@ def lambda_handler(event, context):
             score = float(result['_score'])
             metadata = result['_source']['metadata']
             if score >= textScoreThresholds:
-                if len(product_id_name) > 0:
-                    product_id = metadata[product_id_name]
+                if len(productIdName) > 0:
+                    product_id = metadata[productIdName]
                     if product_id not in product_id_set:
                         products.append({'score':score,'source':metadata})
                         product_id_set.add(product_id)
@@ -137,8 +137,8 @@ def lambda_handler(event, context):
             score = result['_score']
             metadata = result['_source']['metadata']
             if score >= vectorScoreThresholds:
-                if len(product_id_name) > 0:
-                    product_id = metadata[product_id_name]
+                if len(productIdName) > 0:
+                    product_id = metadata[productIdName]
                     if product_id not in product_id_set:
                         products.append({'score':score,'source':metadata})
                         product_id_set.add(product_id)
