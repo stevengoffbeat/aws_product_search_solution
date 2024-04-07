@@ -145,7 +145,7 @@ if st.session_state.query:
                         product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
                         st.markdown(product_code_str,unsafe_allow_html=True)
 
-                        score = product_code_list[i]
+                        score = scores_list[i]
                         score_str = f"<p style='font-size:12px;'>score:{score}</p>"
                         st.markdown(score_str,unsafe_allow_html=True)
 
@@ -165,7 +165,7 @@ if st.session_state.query:
                         product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
                         st.markdown(product_code_str,unsafe_allow_html=True)
 
-                        score = product_code_list[i]
+                        score = scores_list[i]
                         score_str = f"<p style='font-size:12px;'>score:{score}</p>"
                         st.markdown(score_str,unsafe_allow_html=True)
 
@@ -185,7 +185,7 @@ if st.session_state.query:
                         product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
                         st.markdown(product_code_str,unsafe_allow_html=True)
 
-                        score = product_code_list[i]
+                        score = scores_list[i]
                         score_str = f"<p style='font-size:12px;'>score:{score}</p>"
                         st.markdown(score_str,unsafe_allow_html=True)
 

@@ -5,12 +5,13 @@ import json
 from datetime import datetime
 import pandas as pd
 
-def image_search(image_url,index,invoke_url,endpoint_name):
+def image_search(image_url,index,invoke_url,endpoint_name,vectorSearchNumber):
     url = invoke_url + '/image_search?'
     url += ('&url='+image_url)
     url += ('&index='+index)
     url += ('&task=image-search')
     url += ('&embeddingEndpoint='+endpoint_name)
+    url += ('&vectorSearchNumber='+str(vectorSearchNumber))
     
     print('url:',url)
     response = requests.get(url)
@@ -42,9 +43,10 @@ with st.sidebar:
 
     index = st.text_input(
         "Please input image search opensearch index",
-        "adidas_demo_test_0406_5",
+        "adidas_demo_test_0407",
         key="image_search_index",
     )
+    vectorSearchNumber = st.slider("Image Search Number",min_value=1, max_value=10, value=3, step=1)
 
 # Add a button to start a new chat
 st.sidebar.button("New Image", on_click=new_image, type='primary')
@@ -67,7 +69,7 @@ if st.session_state.url:
     if len(image_search_sagemaker_endpoint) == 0:
         st.write("Search sagemaker endpoint is None")
     else:
-        products = image_search(st.session_state.url,index,search_invoke_url,image_search_sagemaker_endpoint)
+        products = image_search(st.session_state.url,index,search_invoke_url,image_search_sagemaker_endpoint,vectorSearchNumber)
         
         items_num = len(products)
         if items_num == 0:
@@ -100,55 +102,57 @@ if st.session_state.url:
                     col = i % 3
                     if col == 0:
                         name = item_name_list[i]
-                        name_str = f"<p style='font-size:12px;'>{name}</p>"
-                        st.markdown(name_str, unsafe_allow_html=True)
+                        s = f"<p style='font-size:12px;'>{name}</p>"
+                        st.markdown(s, unsafe_allow_html=True)
                         st.image(image_list[i])
                         with st.expander("详情"):
                             product_code = product_code_list[i]
                             product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
                             st.markdown(product_code_str,unsafe_allow_html=True)
 
-                            score = product_code_list[i]
+                            score = scores_list[i]
                             score_str = f"<p style='font-size:12px;'>score:{score}</p>"
                             st.markdown(score_str,unsafe_allow_html=True)
 
                             description_info = description_list[i]
                             description_info_str = f"<p style='font-size:12px;'>description_info:{description_info}</p>"
                             st.markdown(description_info_str,unsafe_allow_html=True)
+
             with col2:
                 for i in range(items_num):
                     col = i % 3
                     if col == 1:
                         name = item_name_list[i]
-                        name_str = f"<p style='font-size:12px;'>{name}</p>"
-                        st.markdown(name_str, unsafe_allow_html=True)
+                        s = f"<p style='font-size:12px;'>{name}</p>"
+                        st.markdown(s, unsafe_allow_html=True)
                         st.image(image_list[i])
                         with st.expander("详情"):
                             product_code = product_code_list[i]
                             product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
                             st.markdown(product_code_str,unsafe_allow_html=True)
 
-                            score = product_code_list[i]
+                            score = scores_list[i]
                             score_str = f"<p style='font-size:12px;'>score:{score}</p>"
                             st.markdown(score_str,unsafe_allow_html=True)
 
                             description_info = description_list[i]
                             description_info_str = f"<p style='font-size:12px;'>description_info:{description_info}</p>"
                             st.markdown(description_info_str,unsafe_allow_html=True)
+                            
             with col3:
                 for i in range(items_num):
                     col = i % 3
                     if col == 2:
                         name = item_name_list[i]
-                        name_str = f"<p style='font-size:12px;'>{name}</p>"
-                        st.markdown(name_str, unsafe_allow_html=True)
+                        s = f"<p style='font-size:12px;'>{name}</p>"
+                        st.markdown(s, unsafe_allow_html=True)
                         st.image(image_list[i])
                         with st.expander("详情"):
                             product_code = product_code_list[i]
                             product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
                             st.markdown(product_code_str,unsafe_allow_html=True)
 
-                            score = product_code_list[i]
+                            score = scores_list[i]
                             score_str = f"<p style='font-size:12px;'>score:{score}</p>"
                             st.markdown(score_str,unsafe_allow_html=True)
 
