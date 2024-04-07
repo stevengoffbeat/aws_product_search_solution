@@ -100,34 +100,58 @@ if st.session_state.url:
                     col = i % 3
                     if col == 0:
                         name = item_name_list[i]
-                        s = f"<p style='font-size:12px;'>{name}</p>"
-                        st.markdown(s, unsafe_allow_html=True)
+                        name_str = f"<p style='font-size:12px;'>{name}</p>"
+                        st.markdown(name_str, unsafe_allow_html=True)
                         st.image(image_list[i])
                         with st.expander("详情"):
-                            st.write('product_code:' + '\n' +product_code_list[i])
-                            st.write('score:' + '\n' + scores_list[i])
-                            st.write('description_info:' + '\n' + description_list[i])
+                            product_code = product_code_list[i]
+                            product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
+                            st.markdown(product_code_str,unsafe_allow_html=True)
+
+                            score = product_code_list[i]
+                            score_str = f"<p style='font-size:12px;'>score:{score}</p>"
+                            st.markdown(score_str,unsafe_allow_html=True)
+
+                            description_info = description_list[i]
+                            description_info_str = f"<p style='font-size:12px;'>description_info:{description_info}</p>"
+                            st.markdown(description_info_str,unsafe_allow_html=True)
             with col2:
                 for i in range(items_num):
                     col = i % 3
                     if col == 1:
                         name = item_name_list[i]
-                        s = f"<p style='font-size:12px;'>{name}</p>"
-                        st.markdown(s, unsafe_allow_html=True)
+                        name_str = f"<p style='font-size:12px;'>{name}</p>"
+                        st.markdown(name_str, unsafe_allow_html=True)
                         st.image(image_list[i])
                         with st.expander("详情"):
-                            st.write('product_code:' + '\n' +product_code_list[i])
-                            st.write('score:' + '\n' + scores_list[i])
-                            st.write('description_info:' + '\n' + description_list[i])
+                            product_code = product_code_list[i]
+                            product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
+                            st.markdown(product_code_str,unsafe_allow_html=True)
+
+                            score = product_code_list[i]
+                            score_str = f"<p style='font-size:12px;'>score:{score}</p>"
+                            st.markdown(score_str,unsafe_allow_html=True)
+
+                            description_info = description_list[i]
+                            description_info_str = f"<p style='font-size:12px;'>description_info:{description_info}</p>"
+                            st.markdown(description_info_str,unsafe_allow_html=True)
             with col3:
                 for i in range(items_num):
                     col = i % 3
                     if col == 2:
                         name = item_name_list[i]
-                        s = f"<p style='font-size:12px;'>{name}</p>"
-                        st.markdown(s, unsafe_allow_html=True)
+                        name_str = f"<p style='font-size:12px;'>{name}</p>"
+                        st.markdown(name_str, unsafe_allow_html=True)
                         st.image(image_list[i])
                         with st.expander("详情"):
-                            st.write('product_code:' + '\n' +product_code_list[i])
-                            st.write('score:' + '\n' + scores_list[i])
-                            st.write('description_info:' + '\n' + description_list[i])
+                            product_code = product_code_list[i]
+                            product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
+                            st.markdown(product_code_str,unsafe_allow_html=True)
+
+                            score = product_code_list[i]
+                            score_str = f"<p style='font-size:12px;'>score:{score}</p>"
+                            st.markdown(score_str,unsafe_allow_html=True)
+
+                            description_info = description_list[i]
+                            description_info_str = f"<p style='font-size:12px;'>description_info:{description_info}</p>"
+                            st.markdown(description_info_str,unsafe_allow_html=True)
