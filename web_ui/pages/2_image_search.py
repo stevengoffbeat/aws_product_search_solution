@@ -53,7 +53,6 @@ st.sidebar.button("New Image", on_click=new_image, type='primary')
 
 st.session_state.url = st.text_input(label="Please input image URL", value="")
 
-#if st.button('Image Search'):
 if st.session_state.url:
     if len(st.session_state.url) ==0:
         st.write("Image url is None")

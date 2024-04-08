@@ -9,6 +9,7 @@ def product_search(query,
                 invoke_url,
                 index,
                 endpoint_name: str = '',
+                rerankerEndpoint: str = '',
                 searchType: str = 'text',
                 textSearchNumber: int = 3,
                 vectorSearchNumber: int = 0,
@@ -23,6 +24,8 @@ def product_search(query,
     url += ('&index='+index)
     if len(endpoint_name) > 0:
         url += ('&embeddingEndpoint='+endpoint_name)
+    if len(rerankerEndpoint) > 0:
+        url += ('&rerankerEndpoint='+rerankerEndpoint)
     if textSearchNumber > 0:
         url += ('&textSearchNumber='+str(textSearchNumber))
     if vectorSearchNumber > 0:
@@ -55,7 +58,7 @@ with st.sidebar:
 
     search_invoke_url = st.text_input(
         "Please input a product search api url",
-        "https://gr2nxjp3v4.execute-api.us-east-1.amazonaws.com/prod",
+        "https://yd5z4sbls3.execute-api.us-east-1.amazonaws.com/prod",
         key="product_search_invoke_url",
     )
     product_search_sagemaker_endpoint = st.text_input(
@@ -64,9 +67,15 @@ with st.sidebar:
         key="product_search_endpoint",
     )
 
+    reranker_sagemaker_endpoint = st.text_input(
+        "Please input product reranker sagemaker endpoint",
+        "bge-m3-reranker-2024-04-07-15-03-24-174-endpoint",
+        key="product_reranker_endpoint",
+    )
+
     index = st.text_input(
         "Please input product search opensearch index",
-        "adidas_demo_test_0406_5",
+        "adidas_demo_test_0407",
         key="text_search_index",
     )
     
@@ -84,7 +93,6 @@ st.sidebar.button("New Query", on_click=new_query, type='primary')
 
 st.session_state.query = st.text_input(label="Please input query", value="")
 
-#if st.button('Product Search'):
 if st.session_state.query:
     if len(st.session_state.query) ==0:
         st.write("Query is None")
@@ -94,16 +102,19 @@ if st.session_state.query:
         st.write("Embedding sagemaker endpoint is None")
     elif len(index) == 0:
         st.write("Opensearch index is None")
-        
+    
+    productIdName = 'product_code'
     products = product_search(st.session_state.query,
                               search_invoke_url,
                               index,
                               product_search_sagemaker_endpoint,
+                              reranker_sagemaker_endpoint,
                               search_type,
                               textSearchNumber,
                               vectorSearchNumber,
                               textScoreThresholds,
-                              vectorScoreThresholds
+                              vectorScoreThresholds,
+                              productIdName=productIdName
                              )
             
     items_num = len(products)
@@ -118,9 +129,10 @@ if st.session_state.query:
         description_list = []
         scores_list = []
         product_code_list = []
+        rerank_score_list = []
             
         for product in products:
-            score = product['score']
+            score = round(product['score'],3)
             scores_list.append(str(score))
             source = product['source']
             media_url = source['media_url']
@@ -131,22 +143,30 @@ if st.session_state.query:
             image_list.append(media_url)
             description_list.append(description)
             product_code_list.append(product_code)
+            if search_type == 'mix' and len(reranker_sagemaker_endpoint) > 0:
+                reranker_score = round(product['rerank_score'],3)
+                rerank_score_list.append(reranker_score)
             
         with col1:
             for i in range(items_num):
                 col = i % 3
                 if col == 0:
                     name = item_name_list[i]
-                    name_str = f"<p style='font-size:12px;'>{name}</p>"
-                    st.markdown(name_str, unsafe_allow_html=True)
+                    s = f"<p style='font-size:12px;'>{name}</p>"
+                    st.markdown(s, unsafe_allow_html=True)
                     st.image(image_list[i])
                     with st.expander("详情"):
                         product_code = product_code_list[i]
                         product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
                         st.markdown(product_code_str,unsafe_allow_html=True)
+                        
+                        if len(rerank_score_list) > 0:
+                            rerank_score = rerank_score_list[i]
+                            rerank_score_str = f"<p style='font-size:12px;'>rerank_score:{rerank_score}</p>"
+                            st.markdown(rerank_score_str,unsafe_allow_html=True)
 
                         score = scores_list[i]
-                        score_str = f"<p style='font-size:12px;'>score:{score}</p>"
+                        score_str = f"<p style='font-size:12px;'>recall_score:{score}</p>"
                         st.markdown(score_str,unsafe_allow_html=True)
 
                         description_info = description_list[i]
@@ -157,16 +177,21 @@ if st.session_state.query:
                 col = i % 3
                 if col == 1:
                     name = item_name_list[i]
-                    name_str = f"<p style='font-size:12px;'>{name}</p>"
-                    st.markdown(name_str, unsafe_allow_html=True)
+                    s = f"<p style='font-size:12px;'>{name}</p>"
+                    st.markdown(s, unsafe_allow_html=True)
                     st.image(image_list[i])
                     with st.expander("详情"):
                         product_code = product_code_list[i]
                         product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
                         st.markdown(product_code_str,unsafe_allow_html=True)
 
+                        if len(rerank_score_list) > 0:
+                            rerank_score = rerank_score_list[i]
+                            rerank_score_str = f"<p style='font-size:12px;'>rerank_score:{rerank_score}</p>"
+                            st.markdown(rerank_score_str,unsafe_allow_html=True)
+
                         score = scores_list[i]
-                        score_str = f"<p style='font-size:12px;'>score:{score}</p>"
+                        score_str = f"<p style='font-size:12px;'>recall_score:{score}</p>"
                         st.markdown(score_str,unsafe_allow_html=True)
 
                         description_info = description_list[i]
@@ -177,16 +202,21 @@ if st.session_state.query:
                 col = i % 3
                 if col == 2:
                     name = item_name_list[i]
-                    name_str = f"<p style='font-size:12px;'>{name}</p>"
-                    st.markdown(name_str, unsafe_allow_html=True)
+                    s = f"<p style='font-size:12px;'>{name}</p>"
+                    st.markdown(s, unsafe_allow_html=True)
                     st.image(image_list[i])
                     with st.expander("详情"):
                         product_code = product_code_list[i]
                         product_code_str = f"<p style='font-size:12px;'>product_code:{product_code}</p>"
                         st.markdown(product_code_str,unsafe_allow_html=True)
 
+                        if len(rerank_score_list) > 0:
+                            rerank_score = rerank_score_list[i]
+                            rerank_score_str = f"<p style='font-size:12px;'>rerank_score:{rerank_score}</p>"
+                            st.markdown(rerank_score_str,unsafe_allow_html=True)
+
                         score = scores_list[i]
-                        score_str = f"<p style='font-size:12px;'>score:{score}</p>"
+                        score_str = f"<p style='font-size:12px;'>recall_score:{score}</p>"
                         st.markdown(score_str,unsafe_allow_html=True)
 
                         description_info = description_list[i]

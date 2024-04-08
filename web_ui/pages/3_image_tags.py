@@ -46,27 +46,27 @@ st.sidebar.button("New Image", on_click=new_image, type='primary')
 
 st.session_state.url = st.text_input(label="Please input image URL", value="")
 
-#if st.button('Image Tags'):
+color_tags = st.text_input("color protential tags","white,black,green,pink,blue,gold,organge,gray,brown,red")
+category_tags = st.text_input("category protential tags","Hole Shoes,Sandals,Half Slippers,Beach Shoes,Sneakers,Running Shoes,Canvas Shoes,Water Shoes,Hiking Shoes")
+material_tags = st.text_input("material protential tags","Flat Bottom,Thick Bottom,Rubber Sole,Mesh Surface,Drain Hole,Anti-Slippery,Non-slip Soles,Hollow,Plastic")
+protential_tags_list = []
+protential_tags_list.append(color_tags)
+protential_tags_list.append(category_tags)
+protential_tags_list.append(material_tags)
+
 if st.session_state.url:
     if len(st.session_state.url) ==0:
         st.write("Image url is None")
     elif len(search_invoke_url) == 0:
             st.write("Search invoke url is None")
-            
+
     st.write('输入图片：')
     st.image(st.session_state.url)
-            
-    
+
+
     if len(image_tags_sagemaker_endpoint) == 0:
         st.write("Iamge tags sagemaker endpoint is None")
     else:
-
-        protential_tags_list = [
-            "white,black,green,pink,blue,gold,organge,gray,brown,red",
-            "Low Tops,High Top,No heel",
-            "Hole Shoes,Sandals,Half Slippers,Beach Shoes,Sneakers,Running Shoes,Canvas Shoes,Water Shoes,Hiking Shoes",
-            "Flat Bottom,Thick Bottom,Rubber Sole,Mesh Surface,Drain Hole,Anti-Slippery,Non-slip Soles,Hollow,Plastic"
-        ]
         
         for protential_tags in protential_tags_list:
             tag_confidentials = get_protential_tags(st.session_state.url,protential_tags,search_invoke_url,image_tags_sagemaker_endpoint)
