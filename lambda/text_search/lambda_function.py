@@ -2,37 +2,41 @@ import json
 from typing import List
 from opensearch_search import get_opensearch_client
 from embeddings import get_embedding_sagemaker,get_reranker_scores
+import boto3
 
-response = {
-    "statusCode": 200,
-    "headers": {
-        "Access-Control-Allow-Origin": '*'
-    },
-    "isBase64Encoded": False
-}
-
-def text_search(index: str, search_term: str, size: int = 10):
+def text_search(index: str, search_term: str, name:str='', keyworks:str='', description:str='', size: int = 10):
     client = get_opensearch_client()
     offset = 0
     collapse_size = int(max(size / 15, 15))
+    
+    body ={
+            "from": offset,
+            "size": size,
+            "query": {
+                "dis_max" : {
+                    "queries" : [
+                    ],
+                    "tie_breaker" : 0.7
+                }
+            },
+            "fields":[
+                "_id"
+            ]
+        }
+    
+    if len(name) > 0:
+        name_query = { "match_bool_prefix" : { "metadata."+name : { "query": search_term, "boost": 1.2 }}}
+        body['query']['dis_max']['queries'].append(name_query)
+        
+    if len(keyworks) > 0:
+        keywork_query = { "match_bool_prefix" : { "metadata."+keyworks : { "query": search_term, "boost": 1 }}}
+        body['query']['dis_max']['queries'].append(keywork_query)
+    
+    if len(description) > 0:
+        description_query = { "match_bool_prefix" : { "metadata."+description : { "query": search_term, "boost": 1 }}}
+        body['query']['dis_max']['queries'].append(description_query)
 
-    results = client.search(index = index, body={
-                "from": offset,
-                "size": size,
-                "query": {
-                    "dis_max" : {
-                        "queries" : [
-                            { "match_bool_prefix" : { "metadata.product_name" : { "query": search_term, "boost": 1.2 }}},
-                            { "match_bool_prefix" : { "metadata.description_info" : { "query": search_term, "boost": 0.6 }}}
-                        ],
-                        "tie_breaker" : 0.7
-                    }
-                },
-                "fields":[
-                    "_id"
-                ]
-            }
-        )
+    results = client.search(index = index, body=body)
 
     return results['hits']['hits']
 
@@ -117,61 +121,141 @@ def lambda_handler(event, context):
     rerankerEndpoint = ""
     if "rerankerEndpoint" in evt_body.keys():
         rerankerEndpoint = evt_body['rerankerEndpoint']
-    
-    products = []
-    product_id_set = set()
-    if (searchType == 'text' or searchType == 'mix') and len(index) > 0 and len(query) > 0:
-        results = text_search(index,query,size=textSearchNumber)
-        for result in results:
-            score = float(result['_score'])
-            metadata = result['_source']['metadata']
-            if score >= textScoreThresholds:
-                if len(productIdName) > 0:
-                    product_id = metadata[productIdName]
-                    if product_id not in product_id_set:
-                        products.append({'score':score,'source':metadata})
-                        product_id_set.add(product_id)
-                else:
-                    products.append({'score':score,'source':metadata})
-       
-    if (searchType == 'vector' or searchType == 'mix') and embeddingType == 'sagemaker' and len(index) > 0 and len(query) > 0 and len(embeddingEndpoint) > 0:
-        embedding = get_embedding_sagemaker(embeddingEndpoint,query,language=language)
-        results = vector_search(index,embedding,size=vectorSearchNumber,vector_field=vectorField)
-        for result in results:
-            score = result['_score']
-            metadata = result['_source']['metadata']
-            if score >= vectorScoreThresholds:
-                if len(productIdName) > 0:
-                    product_id = metadata[productIdName]
-                    if product_id not in product_id_set:
-                        products.append({'score':score,'source':metadata})
-                        product_id_set.add(product_id)
-                else:
-                    products.append({'score':score,'source':metadata})
-                    
-    if searchType == 'mix' and len(rerankerEndpoint) > 0:
-        pairs = []
-        for product in products:
-            product_name = product['source']['product_name']
-            pair = [query,product_name]
-            pairs.append(pair)
-
-        scores = get_reranker_scores(pairs,rerankerEndpoint)
-        scores = scores['rerank_scores']
-        new_products=[]
-        for i in range(len(products)):
-            new_product = products[i].copy()
-            new_product['rerank_score'] = scores[i]
-            new_products.append(new_product)
-        products = sorted(new_products,key=lambda new_products:new_products['rerank_score'],reverse=True)
         
+    keyworks = ""
+    if "keyworks" in evt_body.keys():
+        keyworks = evt_body['keyworks']
+    print('keyworks:', keyworks)
     
-    print('products:',products)
-                
-    response['body'] = json.dumps(
-    {
-        'products': products
-    })      
+    description = ""
+    if "description" in evt_body.keys():
+        description = evt_body['description']
+    print('description:', description)
+        
+    task = 'search'
+    if "task" in evt_body.keys():
+        task = evt_body['task']
+    print('task:',task)
+    
+    if task == 'search':
+        products = []
+        product_id_set = set()
+        if (searchType == 'text' or searchType == 'mix') and len(index) > 0 and len(query) > 0:
+            results = text_search(index,query,productIdName,keyworks,description,size=textSearchNumber)
+            for result in results:
+                score = float(result['_score'])
+                metadata = result['_source']['metadata']
+                if score >= textScoreThresholds:
+                    if len(productIdName) > 0:
+                        product_id = metadata[productIdName]
+                        if product_id not in product_id_set:
+                            products.append({'score':score,'source':metadata})
+                            product_id_set.add(product_id)
+                    else:
+                        products.append({'score':score,'source':metadata})
+           
+        if (searchType == 'vector' or searchType == 'mix') and embeddingType == 'sagemaker' and len(index) > 0 and len(query) > 0 and len(embeddingEndpoint) > 0:
+            embedding = get_embedding_sagemaker(embeddingEndpoint,query,language=language)
+            results = vector_search(index,embedding,size=vectorSearchNumber,vector_field=vectorField)
+            for result in results:
+                score = result['_score']
+                metadata = result['_source']['metadata']
+                if score >= vectorScoreThresholds:
+                    if len(productIdName) > 0:
+                        product_id = metadata[productIdName]
+                        if product_id not in product_id_set:
+                            products.append({'score':score,'source':metadata})
+                            product_id_set.add(product_id)
+                    else:
+                        products.append({'score':score,'source':metadata})
+                        
+        if searchType == 'mix' and len(rerankerEndpoint) > 0:
+            pairs = []
+            for product in products:
+                product_name = product['source'][productIdName]
+                pair = [query,product_name]
+                pairs.append(pair)
+    
+            scores = get_reranker_scores(pairs,rerankerEndpoint)
+            scores = scores['rerank_scores']
+            new_products=[]
+            for i in range(len(products)):
+                new_product = products[i].copy()
+                new_product['rerank_score'] = scores[i]
+                new_products.append(new_product)
+            products = sorted(new_products,key=lambda new_products:new_products['rerank_score'],reverse=True)
+            
+        
+        print('products:',products)
+        response = {
+            "statusCode": 200,
+            "headers": {
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'OPTIONS,GET'
+            },
+            "isBase64Encoded": False
+        }
+                    
+        response['body'] = json.dumps(
+        {
+            'products': products
+        }) 
+    elif task == 'opensearch_index':
+        index_list = []
+        try:
+            #get indices list from opensearch
+            client = get_opensearch_client()
+    
+            result = list(client.indices.get_alias().keys())
+            
+            for indice in result:
+                if not indice.startswith("."):
+                    index_list.append(indice)
+            #         index_list.append({"name": indice, "s3_prefix": "", "aos_indice": indice})
+            print(index_list)
+            response = {
+                "statusCode": 200,
+                "headers": {
+                    'Access-Control-Allow-Headers': 'Content-Type',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'OPTIONS,GET'
+                },
+                "isBase64Encoded": False
+            }
+            
+            response['body'] = json.dumps(index_list)
+            
+        except Exception as e:
+            print(e)
+            response = {
+                'statusCode': 500,
+                'body': json.dumps('Internal Server Error')
+            }
+    elif task == 'sagemaker_endpoint':
+        sagemaker = boto3.client('sagemaker')
+        endpoints = sagemaker.list_endpoints()
+        # 从响应中提取处于"InService"状态的所有端点的名称
+        endpoint_names = [
+            endpoint['EndpointName'] for endpoint in endpoints['Endpoints']
+            if endpoint['EndpointStatus'] == 'InService'
+        ]
+        response = {
+            "statusCode": 200,
+            "headers": {
+                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'OPTIONS,GET'
+            },
+            "isBase64Encoded": False
+        }
+        response['body'] = json.dumps(endpoint_names)
+        
+    else:
+        response = {
+                'statusCode': 500,
+                'body': json.dumps('Paremeters Server Error')
+        }
     
     return response
 

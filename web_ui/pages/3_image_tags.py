@@ -4,6 +4,18 @@ import streamlit.components.v1 as components
 import json
 from datetime import datetime
 import pandas as pd
+import boto3
+from botocore.exceptions import ClientError
+import ast
+
+def get_sagemaker_endpoint(invoke_url):
+    url = invoke_url + '/image_search?'
+    url += ('&task=sagemaker_endpoint')
+    print('url:',url)
+    response = requests.get(url)
+    response = ast.literal_eval(response.text)
+    print('sagemaker endpoint:',response)
+    return response
 
 def get_protential_tags(image_url,protential_tags,invoke_url,endpoint_name):
     url = invoke_url + '/image_search?'
@@ -33,12 +45,21 @@ with st.sidebar:
         "https://u9rpcxlh3c.execute-api.us-east-1.amazonaws.com/prod",
         key="image_search_invoke_url",
     )
-   
-    image_tags_sagemaker_endpoint = st.text_input(
-        "Please input image tags sagemaker endpoint",
-        "endpoint-clip-vit-base-patch32-2024-04-06-14-47-27-967",
-        key="image_tags_endpoint",
+    
+    account = st.text_input(
+        "Please input aws account:",
+        "513489159680",
+        key="account",
     )
+    region = st.text_input(
+        "Please input region:",
+        "us-east-1",
+        key="region",
+    )
+
+    sagemaker_endpoint = get_sagemaker_endpoint(search_invoke_url)
+    image_tags_sagemaker_endpoint = st.selectbox("Please Select image embedding sagemaker endpoint",sagemaker_endpoint)
+    
     threshold = st.slider("Tag threshold",min_value=0.0, max_value=1.0, value=0.3, step=0.01)
 
 # Add a button to start a new chat

@@ -19,6 +19,7 @@ class ImageSearchStack(Stack):
             actions=[
                 'sagemaker:InvokeEndpointAsync',
                 'sagemaker:InvokeEndpoint',
+                'sagemaker:ListEndpoints',
                 'lambda:AWSLambdaBasicExecutionRole',
                 'lambda:InvokeFunction',
                 'secretsmanager:SecretsManagerReadWrite',
@@ -42,6 +43,36 @@ class ImageSearchStack(Stack):
             iam.ManagedPolicy.from_aws_managed_policy_name("SecretsManagerReadWrite")
         )
         
+        image_search_role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess")
+        )
+        
+        ACCOUNT = os.getenv('AWS_ACCOUNT_ID', '')
+        REGION = os.getenv('AWS_REGION', '')
+        AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID', '')
+        AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', '')
+        _bucket_name = "intelligent-image-search-data" + "-" + ACCOUNT + "-" + REGION
+        
+        _bucket = s3.Bucket(self,
+                            id=_bucket_name,
+                            bucket_name=_bucket_name,
+                            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+                            encryption=s3.BucketEncryption.S3_MANAGED,
+                            enforce_ssl=True,
+                            versioned=False,
+                            removal_policy=RemovalPolicy.DESTROY
+                            )
+                            
+        _bucket.add_cors_rule(
+            allowed_headers=["*"],
+            allowed_methods=[
+                             s3.HttpMethods.GET,
+                             s3.HttpMethods.PUT,
+                             s3.HttpMethods.POST
+                             ],
+            allowed_origins=["*"]
+        )
+        
         search_layer = _lambda.LayerVersion(
             self, 'SearchLayer',
             code=_lambda.Code.from_asset('../lambda/search_layer'),
@@ -61,6 +92,12 @@ class ImageSearchStack(Stack):
             timeout=Duration.minutes(10),
             reserved_concurrent_executions=100
         )
+        
+        image_search_function.add_environment("account", ACCOUNT)
+        image_search_function.add_environment("region", REGION) 
+        image_search_function.add_environment("aws_access_key_id", AWS_ACCESS_KEY_ID)
+        image_search_function.add_environment("aws_secret_access_key", AWS_SECRET_ACCESS_KEY)
+        image_search_function.add_environment("bucket_name", _bucket_name) 
         
         image_search_api = apigw.RestApi(self, 'image-search-api',
                                default_cors_preflight_options=apigw.CorsOptions(

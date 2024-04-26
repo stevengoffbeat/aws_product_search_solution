@@ -19,6 +19,7 @@ class TextSearchStack(Stack):
             actions=[
                 'sagemaker:InvokeEndpointAsync',
                 'sagemaker:InvokeEndpoint',
+                'sagemaker:ListEndpoints',
                 'lambda:AWSLambdaBasicExecutionRole',
                 'lambda:InvokeFunction',
                 'secretsmanager:SecretsManagerReadWrite',
