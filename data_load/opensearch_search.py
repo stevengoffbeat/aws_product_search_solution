@@ -83,7 +83,7 @@ def _bulk_ingest_embeddings(
         metadata = metadatas[i] if metadatas else {}
         _id = ids[i] if ids else str(uuid.uuid4())
         request = {}
-        if image_embeddings is not None:
+        if len(embeddings) > 0 and image_embeddings is not None:
             request = {
                 "_op_type": "index",
                 "_index": index_name,
@@ -92,11 +92,19 @@ def _bulk_ingest_embeddings(
                 image_vector_field: image_embeddings[i],
                 "metadata": metadata,
             }
-        else:
+        elif len(embeddings) > 0 :
             request = {
                 "_op_type": "index",
                 "_index": index_name,
                 vector_field: embeddings[i],
+                text_field: text,
+                "metadata": metadata,
+            }
+        elif image_embeddings is not None:
+            request = {
+                "_op_type": "index",
+                "_index": index_name,
+                image_vector_field: image_embeddings[i],
                 text_field: text,
                 "metadata": metadata,
             }
@@ -121,7 +129,7 @@ def _default_text_mapping(
     image_vector_field: str = "image_vector_field",
 ) -> Dict:
     """For Approximate k-NN Search, this is the default mapping to create index."""
-    if image_dim > 0:
+    if image_dim > 0 and dim > 0:
         return {
             "settings": {"index": {"knn": True, "knn.algo_param.ef_search": ef_search}},
             "mappings": {
@@ -136,6 +144,24 @@ def _default_text_mapping(
                             "parameters": {"ef_construction": ef_construction, "m": m},
                         },
                     },
+                    image_vector_field: {
+                        "type": "knn_vector",
+                        "dimension": image_dim,
+                        "method": {
+                            "name": "hnsw",
+                            "space_type": space_type,
+                            "engine": engine,
+                            "parameters": {"ef_construction": ef_construction, "m": m},
+                        },
+                    }
+                }
+            },
+        }
+    if image_dim > 0:
+        return {
+            "settings": {"index": {"knn": True, "knn.algo_param.ef_search": ef_search}},
+            "mappings": {
+                "properties": {
                     image_vector_field: {
                         "type": "knn_vector",
                         "dimension": image_dim,
@@ -190,9 +216,9 @@ def add_products(
         bulk_size: int = 10000000,
         **kwargs: Any,
     ) -> List[str]:
-        _validate_embeddings_and_bulk_size(len(embeddings), bulk_size)
+        #_validate_embeddings_and_bulk_size(len(embeddings), bulk_size)
         text_field = kwargs.get("text_field", "text")
-        dim = len(embeddings[0])
+        dim = len(embeddings[0]) if len(embeddings) > 0 else 0
         image_dim = len(image_embeddings[0]) if image_embeddings is not None else 0
         engine = kwargs.get("engine", "nmslib")
         space_type = kwargs.get("space_type", "l2")
