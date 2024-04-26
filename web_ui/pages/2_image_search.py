@@ -127,18 +127,18 @@ with st.sidebar:
 
     search_invoke_url = st.text_input(
         "Please input a image search api url",
-        "https://86ldakcpzb.execute-api.us-east-1.amazonaws.com/prod",
+        "",
         key="image_search_invoke_url",
     )
 
     account = st.text_input(
         "Please input aws account:",
-        "513489159680",
+        "",
         key="account",
     )
     region = st.text_input(
         "Please input region:",
-        "us-east-1",
+        "",
         key="region",
     )
 

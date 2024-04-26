@@ -96,18 +96,18 @@ def new_file() -> None:
 with st.sidebar:
     invoke_url = st.text_input(
         "Please input a data load api url",
-        "https://umquitr1fj.execute-api.us-east-1.amazonaws.com/prod",
+        "",
         key="image_search_invoke_url",
     )
     
     account = st.text_input(
         "Please input aws account:",
-        "513489159680",
+        "",
         key="account",
     )
     region = st.text_input(
         "Please input region:",
-        "us-east-1",
+        "",
         key="region",
     )
 

@@ -84,7 +84,7 @@ with st.sidebar:
 
     search_invoke_url = st.text_input(
         "Please input a product search api url",
-        "https://epr1iwi0jh.execute-api.us-east-1.amazonaws.com/prod",
+        "",
         key="product_search_invoke_url",
     )
     
