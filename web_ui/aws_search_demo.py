@@ -8,17 +8,17 @@ st.write('# AWS Product Search Solution')
 
 st.markdown(
     """
-    AWS Product Search Solution 是一个提升电商商品搜索结果的解决方案，主要特征包括：
-    ### 商品搜索
-    - 文本搜索：通过用户输入的query文本与商品描述文本的匹配进行搜索
-    - 向量搜索：通过计算用户输入的query文本向量与商品描述文本向量的向量相似度进行搜索
-    - 混合搜索：同时支持文本搜索和向量搜索
+    AWS Product Search Solution is a solution for improving e-commerce product search results. Its main features include:
+    ### product search
+    - Text search: Search by matching the query text entered by the user with the product description text
+    - Vector search: Search by calculating the vector similarity between the query text vector input by the user and the product description text vector.
+    - Hybrid search: supports both text search and vector search
     
-    ### 图片搜索
-    - 向量搜索：通过计算用户输入图片向量与商品图片向量的向量相似度进行搜索
+    ### Image search
+    - Vector search: Search by calculating the vector similarity between the user input image vector and the product image vector
 
-    ### 图片打标
-    - 向量打标：通过计算用户输入图片向量与标签信息向量的向量相似度进行搜索
+    ### Image tagging
+    - Vector tagging: Tagging by calculating the vector similarity between the user input image vector and the label information vector
     
     """
 )

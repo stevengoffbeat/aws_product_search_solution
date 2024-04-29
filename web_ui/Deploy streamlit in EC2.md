@@ -59,9 +59,9 @@ sudo systemctl start nginx.service
 ### 5.Run streamlit ui stript
 
 ```
-cd /home/ec2-user/image_search/web_ui
+cd /home/ec2-user/aws_product_search_solution/web_ui
 tmux
-streamlit run demo_ui.py
+streamlit run aws_search_demo.py
 ```
 
 ### 6.Open ui page
