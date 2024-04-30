@@ -73,7 +73,7 @@ In the Amazon SageMaker -> Notebook instances -> SearchGuideNotebook
 
 * open clip_image_embedding_deploy/deploy-clip-image-embedding.ipynb to deploy the image search model
 
-* open text_embedding_deploy/text_embedding_deploy to deploy the text search model
+* open text_embedding_deploy/bge_m3_deploy.ipynb to deploy the text search model
 
 * open rerank_model_deploy/bge_m3_reranker_deploy.ipynb to deploy the reranker model
 
