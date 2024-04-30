@@ -22,11 +22,7 @@
 
     a.In the IAM Role page, click Create role
     
-    ![EC2](/images/ec2-4.png)
-    
     b.In the Select trusted entity page, select EC2 in the Use case and click next
-    
-    ![EC2](/images/ec2-5.png)
     
     c.Select role:
     
@@ -42,11 +38,11 @@
         
         Create the role
         
-        ![EC2](/images/ec2-6.png)
-        
     d.Select the role in the IAM instance profile
     
-    ![EC2](/images/ec2-7.png)
+![EC2](/images/ec2-6.png)
+
+![EC2](/images/ec2-7.png)
     
 (7)	Launch the EC2 and Connect the EC2
 
