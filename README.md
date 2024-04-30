@@ -1,8 +1,10 @@
 # Deployment guide
 
-### 0.Create EC2 instance
+### 0.Launch EC2 instance
 
 (1)	input name, such as ‘product_search’
+
+![EC2](/image/ec2-1.png)
 
 (2)	Instance type select t3.large
 
@@ -10,13 +12,21 @@
 
 (4)	In the Network setting, select ‘Allow HTTP traffic from the internet’
 
+![EC2](/image/ec2-2.png)
+
 (5)	In the configure storge, input ‘20’ GiB
+
+![EC2](/image/ec2-3.png)
 
 (6)	In the Advanced details, click ‘Create new IAM profile’
 
     a.In the IAM Role page, click Create role
     
+    ![EC2](/image/ec2-4.png)
+    
     b.In the Select trusted entity page, select EC2 in the Use case and click next
+    
+    ![EC2](/image/ec2-5.png)
     
     c.Select role:
     
@@ -30,9 +40,17 @@
         
         •	SecretsManagerReadWrite
         
+        Create the role
+        
+        ![EC2](/image/ec2-6.png)
+        
     d.Select the role in the IAM instance profile
     
+    ![EC2](/image/ec2-7.png)
+    
 (7)	Launch the EC2 and Connect the EC2
+
+![EC2](/image/ec2-8.png)
 
 (8) download the code from git
 
