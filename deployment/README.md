@@ -7,6 +7,7 @@ Please make sure you have over 14 GB memory and Python 3 and npm installed on yo
 If there's no npm, install via nvm:
 ```
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+source /home/ec2-user/.bashrc
 ```
 Note the v0.39.3 is just an example, download your preferred version.Then close and reopen terminal, then
 
@@ -36,6 +37,7 @@ npm install -g aws-cdk
 ### 3. Bootstrap the CDK to provision all the infrastructure needed for the CDK to make changes to your AWS account
 
 ```
+sudo yum install python3-pip
 pip install -r requirements.txt
 ```
 (precondition: you have installed pip via "sudo apt install python3-pip")
