@@ -68,11 +68,13 @@ streamlit run aws_search_demo.py
 
 Enter the url in the webpage：http://<EC2 public IP>
 
-### 6.configure the invoke url
+### 7.configure the invoke url
 
 (1) copy the text search invoke url from api gateway
 
 ![EC2](../images/text-search.png)
+
+paste the invoke url into the webpage api url input box
 
 ![EC2](../images/text-search-ui.png)
 
@@ -80,10 +82,14 @@ Enter the url in the webpage：http://<EC2 public IP>
 
 ![EC2](../images/image-search.png)
 
+paste the invoke url into the webpage api url input box
+
 ![EC2](../images/image-search-ui.png)
 
 (1) copy the text search invoke url from api gateway
 
 ![EC2](../images/data-load.png)
+
+paste the invoke url into the webpage api url input box
 
 ![EC2](../images/data-load-ui.png)
