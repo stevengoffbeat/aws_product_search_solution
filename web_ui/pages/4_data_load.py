@@ -187,7 +187,13 @@ if st.session_state.uploaded_file:
                                 st.write(record)
 
 
-                    my_bar.progress(percent_complete + 1, text=progress_text)
+                    if len(file_list) <= 100:
+                        my_bar.progress(percent_complete + int(100/len(file_list)), text=progress_text)
+                    else:
+                        if percent_complete % int(len(file_list)/100) == 0:
+                            my_bar.progress(percent_complete + 1, text=progress_text)
+
+                my_bar.progress(100, text="finish load the data!")
 
 
         os.remove(file_name)
