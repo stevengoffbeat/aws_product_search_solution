@@ -57,9 +57,12 @@ git clone https://github.com/paulhebo/aws_product_search_solution.git
 ```
 
 
+
 ### 1. Lambda and OpenSearch deployment
 
 Deploy resources with reference to ./deployment/README.md
+
+
 
 
 ### 2. model deployment
@@ -75,15 +78,21 @@ In the Amazon SageMaker -> Notebook instances -> SearchGuideNotebook
 * open rerank_model_deploy/bge_m3_reranker_deploy.ipynb to deploy the reranker model
 
 
+
+
 ### 3. webUI deployment
 
 
 Deploy webUI with reference to ./web_ui/Deploy streamlit in EC2.md
 
 
+
+
 ### 4. Online data load
 
 In the the web ui page, open data_load page to load data. 
+
+
 
 
 ### 5. Offline data load
