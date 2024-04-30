@@ -3,22 +3,39 @@
 ### 0.Create EC2 instance
 
 (1)	input name, such as ‘product_search’
+
 (2)	Instance type select t3.large
+
 (3)	Create new Key pair
+
 (4)	In the Network setting, select ‘Allow HTTP traffic from the internet’
+
 (5)	In the configure storge, input ‘20’ GiB
+
 (6)	In the Advanced details, click ‘Create new IAM profile’
+
     a.In the IAM Role page, click Create role
+    
     b.In the Select trusted entity page, select EC2 in the Use case and click next
+    
     c.Select role:
+    
         •	AmazonOpenSearchServiceFullAccess
+        
         •	AmazonS3FullAccess
+        
         •	AmazonSageMakerFullAccess
+        
         •	AWSCloudFormationFullAccess
+        
         •	SecretsManagerReadWrite
+        
     d.Select the role in the IAM instance profile
+    
 (7)	Launch the EC2 and Connect the EC2
+
 (8) download the code from git
+
 ```
 sudo yum update
 sudo yum install git
