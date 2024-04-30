@@ -78,7 +78,7 @@ paste the invoke url into the webpage api url input box
 
 ![EC2](../images/text-search-ui.png)
 
-(1) copy the image search invoke url from api gateway
+(2) copy the image search invoke url from api gateway
 
 ![EC2](../images/image-search.png)
 
@@ -86,7 +86,7 @@ paste the invoke url into the webpage api url input box
 
 ![EC2](../images/image-search-ui.png)
 
-(1) copy the text search invoke url from api gateway
+(3) copy the data load invoke url from api gateway
 
 ![EC2](../images/data-load.png)
 
