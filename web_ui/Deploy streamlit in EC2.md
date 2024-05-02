@@ -11,6 +11,7 @@ sudo yum update
 sudo yum install nginx
 sudo yum install tmux -y
 sudo yum install python3-pip
+pip install streamlit
 ```
 
 ### 3.Create nginx profiles
