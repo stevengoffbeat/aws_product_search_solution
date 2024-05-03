@@ -216,7 +216,11 @@ def lambda_handler(event, context):
     else:
         response = {
                 'statusCode': 500,
-                'body': json.dumps('Paremeters Server Error')
         }
+        response['body'] = json.dumps(
+            {
+                'result':"Paremeters Server Error"
+            }
+        )
     
     return response
