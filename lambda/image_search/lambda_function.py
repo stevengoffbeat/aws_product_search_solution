@@ -1,7 +1,7 @@
 import json
 from typing import List
 from opensearch_search import get_opensearch_client
-from image_embedding import *
+from embeddings import *
 import boto3
 
 bucket = os.environ.get('bucket_name')

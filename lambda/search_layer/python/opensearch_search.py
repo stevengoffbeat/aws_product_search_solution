@@ -83,7 +83,7 @@ def _bulk_ingest_embeddings(
         metadata = metadatas[i] if metadatas else {}
         _id = ids[i] if ids else str(uuid.uuid4())
         request = {}
-        if len(embeddings) > 0 and image_embeddings is not None:
+        if len(embeddings) > 0 and image_embeddings is not None and len(image_embeddings) > 0:
             request = {
                 "_op_type": "index",
                 "_index": index_name,
@@ -100,7 +100,7 @@ def _bulk_ingest_embeddings(
                 text_field: text,
                 "metadata": metadata,
             }
-        elif image_embeddings is not None:
+        elif image_embeddings is not None and len(image_embeddings) > 0:
             request = {
                 "_op_type": "index",
                 "_index": index_name,
@@ -219,7 +219,7 @@ def add_products(
         #_validate_embeddings_and_bulk_size(len(embeddings), bulk_size)
         text_field = kwargs.get("text_field", "text")
         dim = len(embeddings[0]) if len(embeddings) > 0 else 0
-        image_dim = len(image_embeddings[0]) if image_embeddings is not None else 0
+        image_dim = len(image_embeddings[0]) if image_embeddings is not None and len(image_embeddings) > 0 else 0
         engine = kwargs.get("engine", "nmslib")
         space_type = kwargs.get("space_type", "l2")
         ef_search = kwargs.get("ef_search", 512)

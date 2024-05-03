@@ -155,7 +155,7 @@ def lambda_handler(event, context):
                         products.append({'score':score,'source':metadata})
            
         if (searchType == 'vector' or searchType == 'mix') and embeddingType == 'sagemaker' and len(index) > 0 and len(query) > 0 and len(embeddingEndpoint) > 0:
-            embedding = get_embedding_sagemaker(embeddingEndpoint,query,language=language)
+            embedding = get_embedding_sagemaker(embeddingEndpoint,query,language=language,is_query=True)
             results = vector_search(index,embedding,size=vectorSearchNumber,vector_field=vectorField)
             for result in results:
                 score = result['_score']

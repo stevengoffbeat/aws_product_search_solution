@@ -33,6 +33,7 @@ upstream ws-backend {
 server {
     listen 80;
     server_name xxx.xxx.xxx.xxx;
+    client_max_body_size 100m;
 
     location / {
             
